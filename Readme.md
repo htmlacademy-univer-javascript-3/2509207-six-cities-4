@@ -3,7 +3,7 @@
 * Студент: [Александр Чернышов](https://up.htmlacademy.ru/univer-js3/4/user/2509207).
 * Наставник: `Алексей Козлов`.
 
----
+--- 
 
 _Не удаляйте и не изменяйте папки и файлы:_
 _`.editorconfig`, `.gitattributes`, `.gitignore`._
