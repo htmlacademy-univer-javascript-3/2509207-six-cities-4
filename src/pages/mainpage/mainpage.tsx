@@ -1,5 +1,4 @@
-import { ListCards } from './cards';
-import ListPlaces from './cards';
+import Cards from './cards';
 import { Cities } from '../../const';
 
 function Location(): JSX.Element {
@@ -8,14 +7,15 @@ function Location(): JSX.Element {
       <section className="locations container">
         <ul className="locations__list tabs__list">
           {
-            Cities.map((place) =>
-              (<li className="locations__item">
+            Cities.map((location) =>
+              (
+              <li className="locations__item" key={location.name}>
                 <a className="locations__item-link tabs__item" href="#">
-                  <span>{place.name}</span>
-                </a>
-               </li>)
+                  <span>{location.name}</span>
+                </a>  
+              </li>)
             )
-          }
+          }     
         </ul>
       </section>
     </div>
@@ -23,7 +23,7 @@ function Location(): JSX.Element {
 }
 
 
-function Hub({ places }: ListCards): JSX.Element {
+function Hub({ count }: {count : number }): JSX.Element {
   return (
     <main className="page__main page__main--index">
       <h1 className="visually-hidden">Cities</h1>
@@ -48,7 +48,7 @@ function Hub({ places }: ListCards): JSX.Element {
                 <li className="places__option" tabIndex={0}>Top rated first</li>
               </ul>
             </form>
-            <ListPlaces places={places} />
+            <Cards count={count} />
           </section>
           <div className="cities__right-section">
             <section className="cities__map map"></section>
