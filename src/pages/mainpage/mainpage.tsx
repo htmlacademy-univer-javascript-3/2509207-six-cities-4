@@ -1,33 +1,48 @@
-import Cards from './cards';
-import { Cities } from '../../const';
+import { useState } from 'react';
+import Offer from '../../components/offer/offer';
+import { OfferProps } from '../../components/offer/offer';
 
-function Location(): JSX.Element {
+
+function ListLocations({ locations }: { locations: string[] }): JSX.Element {
   return (
     <div className="tabs">
       <section className="locations container">
         <ul className="locations__list tabs__list">
           {
-            Cities.map((location) =>
+            locations.map((location) =>
               (
-              <li className="locations__item" key={location.name}>
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>{location.name}</span>
-                </a>  
-              </li>)
+                <li className="locations__item" key={location}>
+                  <a className="locations__item-link tabs__item" href="#">
+                    <span>{location}</span>
+                  </a>
+                </li>)
             )
-          }     
+          }
         </ul>
       </section>
     </div>
   );
 }
 
+function ListOffers({ offers }: {offers: OfferProps[]}): JSX.Element {
+  const [activeOffer, setActiveOffer] = useState(offers[0]);
+  console.log(activeOffer.id);
+  return (
+    <div className="cities__places-list places__list tabs__content">
+      {
+        offers.map((e) => (
+          <Offer offer={e} setState={() => setActiveOffer(e)} key={e.id}/>
+        ))
+      }
+    </div>
+  );
+}
 
-function Hub({ count }: {count : number }): JSX.Element {
+function Hub({ offers, locations }: { offers: OfferProps[]; locations: string[] }): JSX.Element {
   return (
     <main className="page__main page__main--index">
       <h1 className="visually-hidden">Cities</h1>
-      <Location />
+      <ListLocations locations={locations}/>
       <div className="cities">
         <div className="cities__places-container container">
           <section className="cities__places places">
@@ -48,7 +63,7 @@ function Hub({ count }: {count : number }): JSX.Element {
                 <li className="places__option" tabIndex={0}>Top rated first</li>
               </ul>
             </form>
-            <Cards count={count} />
+            <ListOffers offers={offers} />
           </section>
           <div className="cities__right-section">
             <section className="cities__map map"></section>
@@ -58,6 +73,5 @@ function Hub({ count }: {count : number }): JSX.Element {
     </main>
   );
 }
-
 
 export default Hub;
