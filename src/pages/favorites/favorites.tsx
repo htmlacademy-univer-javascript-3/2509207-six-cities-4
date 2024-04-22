@@ -1,4 +1,4 @@
-import { OfferProps } from '../../components/offer/offer';
+import { OfferProps } from '../../types/offer';
 import { FavoriteOffer } from '../../components/offer/offer';
 
 
@@ -15,7 +15,7 @@ function ListCityFavoriteOffers({ offers }: { offers: OfferProps[] }): JSX.Eleme
       <div className="favorites__places">
         {
           offers.map((e) => (
-            <FavoriteOffer offer={e} key={e.id}/>
+            <FavoriteOffer offer={e} key={e.id} />
           ))
         }
       </div>
@@ -23,13 +23,13 @@ function ListCityFavoriteOffers({ offers }: { offers: OfferProps[] }): JSX.Eleme
   );
 }
 
-function ListFavoriteOffers({ offers }: {offers: OfferProps[]}): JSX.Element {
+function ListFavoriteOffers({ offers }: { offers: OfferProps[] }): JSX.Element {
   const offersByCities = [offers];
   return (
     <ul className="favorites__list">
       {
         offersByCities.map((offersByCity) => (
-          <ListCityFavoriteOffers offers={offersByCity } key={(offersByCity)[0].city.name}/>
+          <ListCityFavoriteOffers offers={offersByCity} key={(offersByCity)[0].city.name} />
         ))
       }
     </ul>

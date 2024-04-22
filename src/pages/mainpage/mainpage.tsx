@@ -1,21 +1,22 @@
 import { useState } from 'react';
 import Offer from '../../components/offer/offer';
-import { OfferProps } from '../../components/offer/offer';
+import Map from '../../components/location/map';
+import { OfferProps } from '../../types/offer';
+import { City, Point } from '../../types/location';
 
-
-function ListLocations({ locations }: { locations: string[] }): JSX.Element {
+function ListLocations({ locations }: { locations: City[] }): JSX.Element {
   return (
     <div className="tabs">
       <section className="locations container">
         <ul className="locations__list tabs__list">
           {
             locations.map((location) =>
-              (
-                <li className="locations__item" key={location}>
-                  <a className="locations__item-link tabs__item" href="#">
-                    <span>{location}</span>
-                  </a>
-                </li>)
+            (
+              <li className="locations__item" key={location.title}>
+                <a className="locations__item-link tabs__item" href="#">
+                  <span>{location.title}</span>
+                </a>
+              </li>)
             )
           }
         </ul>
@@ -24,25 +25,35 @@ function ListLocations({ locations }: { locations: string[] }): JSX.Element {
   );
 }
 
-function ListOffers({ offers }: {offers: OfferProps[]}): JSX.Element {
-  const [activeOffer, setActiveOffer] = useState(offers[0]);
-  console.log(activeOffer.id);
+function ListOffers({ offers, setActiveOffer }: { offers: OfferProps[]; setActiveOffer: (arg0: OfferProps) => void }): JSX.Element {
   return (
     <div className="cities__places-list places__list tabs__content">
       {
         offers.map((e) => (
-          <Offer offer={e} setState={() => setActiveOffer(e)} key={e.id}/>
+          <Offer offer={e} setState={() => setActiveOffer(e)} key={e.id} />
         ))
       }
     </div>
   );
 }
 
-function Hub({ offers, locations }: { offers: OfferProps[]; locations: string[] }): JSX.Element {
+function GetPointFromOffer(offer: OfferProps): Point {
+  return (
+    {
+      latitude: offer.location.latitude,
+      longitude: offer.location.longitude,
+      title: offer.id
+    }
+  );
+}
+
+export default function Hub({ offers, locations }: { offers: OfferProps[]; locations: City[] }): JSX.Element {
+  const currentLocation = locations[3];
+  const [activeOffer, setActiveOffer] = useState(offers[0]);
   return (
     <main className="page__main page__main--index">
       <h1 className="visually-hidden">Cities</h1>
-      <ListLocations locations={locations}/>
+      <ListLocations locations={locations} />
       <div className="cities">
         <div className="cities__places-container container">
           <section className="cities__places places">
@@ -51,7 +62,7 @@ function Hub({ offers, locations }: { offers: OfferProps[]; locations: string[] 
             <form className="places__sorting" action="#" method="get">
               <span className="places__sorting-caption">Sort by</span>
               <span className="places__sorting-type" tabIndex={0}>
-                                Popular
+                Popular
                 <svg className="places__sorting-arrow" width="7" height="4">
                   <use xlinkHref="#icon-arrow-select"></use>
                 </svg>
@@ -63,10 +74,10 @@ function Hub({ offers, locations }: { offers: OfferProps[]; locations: string[] 
                 <li className="places__option" tabIndex={0}>Top rated first</li>
               </ul>
             </form>
-            <ListOffers offers={offers} />
+            <ListOffers offers={offers} setActiveOffer={setActiveOffer} />
           </section>
           <div className="cities__right-section">
-            <section className="cities__map map"></section>
+          <Map selectedPoint={GetPointFromOffer(activeOffer)} city={currentLocation} points={offers.map((offer) => GetPointFromOffer(offer))}/>
           </div>
         </div>
       </div>
@@ -74,4 +85,3 @@ function Hub({ offers, locations }: { offers: OfferProps[]; locations: string[] 
   );
 }
 
-export default Hub;
