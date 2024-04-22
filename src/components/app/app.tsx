@@ -8,15 +8,16 @@ import NotFound from '../error/404';
 import { PrivateRoute } from '../private-route/private-route';
 import { UserAuthState } from '../private-route/userAuthState';
 
-import { OfferProps } from '../offer/offer';
+import { OfferProps } from '../../types/offer';
+import { City } from '../../types/location';
 
-export default function App(props: { offers: OfferProps[]; locations: string[] }): JSX.Element {
+export default function App(props: { offers: OfferProps[]; locations: City[] }): JSX.Element {
   return (
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Hub {...props} />} />
         <Route path='/login' element={<Login />} />
-        <Route path='/favorites' element={<PrivateRoute userAuthState={UserAuthState.Auth}><Favorites favoriteOffers={props.offers}/></PrivateRoute>} />
+        <Route path='/favorites' element={<PrivateRoute userAuthState={UserAuthState.Auth}><Favorites favoriteOffers={props.offers} /></PrivateRoute>} />
         <Route path='/offer/:id' element={<Offer />} />
         <Route path='*' element={<NotFound />} />
       </Routes>
