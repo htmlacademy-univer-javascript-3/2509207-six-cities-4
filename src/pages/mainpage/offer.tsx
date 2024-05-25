@@ -1,6 +1,6 @@
 import ReviewForm from '../../components/review-form/review-form';
 import { Link } from 'react-router-dom';
-import { OfferWithDetailsMock } from '../../mocks/offers';
+import { OfferWithDetailsMock } from '../../mocked-data';
 import { OfferInformation } from '../../components/offer/offer';
 import { OfferProps, DetailedOfferProps } from '../../types/offer';
 
