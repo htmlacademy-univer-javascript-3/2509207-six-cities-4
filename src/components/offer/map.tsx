@@ -28,6 +28,11 @@ export default function Map({ city, points, selectedPoint }: MapProps): JSX.Elem
     const map = useMap(mapRef, city);
     useEffect(() => {
         if (map) {
+            map.eachLayer((layer) => {
+                if (layer.options.pane === 'markerPane') {
+                  map.removeLayer(layer);
+                }
+              });
             const markerLayer = layerGroup().addTo(map);
             points.forEach((point) => {
                 const marker = new Marker({
@@ -48,6 +53,11 @@ export default function Map({ city, points, selectedPoint }: MapProps): JSX.Elem
             };
         }
     }, [map, points, selectedPoint]);
+    useEffect(() => {
+        if (map) {
+          map.flyTo([city.latitude, city.longitude], city.zoom);
+        }
+      }, [map, city]);
 
     return <section className="cities__map map" ref={mapRef}></section>;
 }
