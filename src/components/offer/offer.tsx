@@ -2,8 +2,6 @@ import { Link } from 'react-router-dom';
 import { OfferProps } from '../../types/offer';
 
 
-
-
 function Premium({ isPremium }: OfferProps): false | JSX.Element {
   return (
     isPremium && (
@@ -30,7 +28,7 @@ export default function Offer({ offer, setState }: { offer: OfferProps; setState
   );
 }
 
-export function OfferInformation({ offer, offerLink }: { offer: OfferProps, offerLink: string }): JSX.Element {
+export function OfferInformation({ offer, offerLink }: { offer: OfferProps; offerLink: string }): JSX.Element {
   return (<div className="place-card__info">
     <div className="place-card__price-wrapper">
       <div className="place-card__price">
@@ -57,7 +55,7 @@ export function OfferInformation({ offer, offerLink }: { offer: OfferProps, offe
     </h2>
     <p className="place-card__type">{offer.type}</p>
   </div>
-  )
+  );
 }
 
 export function FavoriteOffer({ offer }: { offer: OfferProps }): JSX.Element {

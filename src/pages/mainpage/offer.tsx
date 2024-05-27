@@ -46,7 +46,7 @@ function Host(offer: DetailedOfferProps): JSX.Element {
         </p>
       </div>
     </div>
-  )
+  );
 }
 
 function Reviews(): JSX.Element {
@@ -79,7 +79,7 @@ function Reviews(): JSX.Element {
       </ul>
       <ReviewForm />
     </section>
-  )
+  );
 }
 
 function NearPlace(offer: OfferProps): JSX.Element {
@@ -93,7 +93,7 @@ function NearPlace(offer: OfferProps): JSX.Element {
       </div>
       <OfferInformation offer={offer} offerLink={offerLink} />
     </article>
-  )
+  );
 }
 
 function ListNearPlaces(): JSX.Element {
@@ -109,7 +109,7 @@ function ListNearPlaces(): JSX.Element {
         </div>
       </section>
     </div>
-  )
+  );
 }
 
 function ListGoods({ goods }: DetailedOfferProps): JSX.Element {
@@ -122,7 +122,7 @@ function ListGoods({ goods }: DetailedOfferProps): JSX.Element {
         }
       </ul>
     </div>
-  )
+  );
 }
 
 function ListFeatures(offer: DetailedOfferProps): JSX.Element {
@@ -138,7 +138,7 @@ function ListFeatures(offer: DetailedOfferProps): JSX.Element {
         offer.bedrooms > 0 && <li className="offer__feature offer__feature--bedrooms">{offer.bedrooms} Bedrooms</li>
       }
     </ul>
-  )
+  );
 }
 
 function ListOfferPhotos({ images }: DetailedOfferProps): JSX.Element {

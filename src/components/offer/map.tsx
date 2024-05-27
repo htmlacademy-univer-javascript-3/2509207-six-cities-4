@@ -6,15 +6,15 @@ import 'leaflet/dist/leaflet.css';
 
 
 const defaultCustomIcon = new Icon({
-    iconUrl: 'img/pin.svg',
-    iconSize: [40, 40],
-    iconAnchor: [20, 40]
+  iconUrl: 'img/pin.svg',
+  iconSize: [40, 40],
+  iconAnchor: [20, 40]
 });
 
 const currentCustomIcon = new Icon({
-    iconUrl: 'img/pin-active.svg',
-    iconSize: [40, 40],
-    iconAnchor: [20, 40]
+  iconUrl: 'img/pin-active.svg',
+  iconSize: [40, 40],
+  iconAnchor: [20, 40]
 });
 
 type MapProps = {
@@ -24,40 +24,40 @@ type MapProps = {
 }
 
 export default function Map({ city, points, selectedPoint }: MapProps): JSX.Element {
-    const mapRef = useRef(null);
-    const map = useMap(mapRef, city);
-    useEffect(() => {
-        if (map) {
-            map.eachLayer((layer) => {
-                if (layer.options.pane === 'markerPane') {
-                  map.removeLayer(layer);
-                }
-              });
-            const markerLayer = layerGroup().addTo(map);
-            points.forEach((point) => {
-                const marker = new Marker({
-                    lat: point.latitude,
-                    lng: point.longitude
-                });
-
-                marker
-                    .setIcon(
-                        point.title === selectedPoint?.title
-                            ? currentCustomIcon
-                            : defaultCustomIcon
-                    )
-                    .addTo(markerLayer);
-            });
-            return () => {
-                map.removeLayer(markerLayer);
-            };
+  const mapRef = useRef(null);
+  const map = useMap(mapRef, city);
+  useEffect(() => {
+    if (map) {
+      map.eachLayer((layer) => {
+        if (layer.options.pane === 'markerPane') {
+          map.removeLayer(layer);
         }
-    }, [map, points, selectedPoint]);
-    useEffect(() => {
-        if (map) {
-          map.flyTo([city.latitude, city.longitude], city.zoom);
-        }
-      }, [map, city]);
+      });
+      const markerLayer = layerGroup().addTo(map);
+      points.forEach((point) => {
+        const marker = new Marker({
+          lat: point.latitude,
+          lng: point.longitude
+        });
 
-    return <section className="cities__map map" ref={mapRef}></section>;
+        marker
+          .setIcon(
+            point.title === selectedPoint?.title
+              ? currentCustomIcon
+              : defaultCustomIcon
+          )
+          .addTo(markerLayer);
+      });
+      return () => {
+        map.removeLayer(markerLayer);
+      };
+    }
+  }, [map, points, selectedPoint]);
+  useEffect(() => {
+    if (map) {
+      map.flyTo([city.latitude, city.longitude], city.zoom);
+    }
+  }, [map, city]);
+
+  return <section className="cities__map map" ref={mapRef}></section>;
 }

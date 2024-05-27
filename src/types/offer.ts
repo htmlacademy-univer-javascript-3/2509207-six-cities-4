@@ -27,7 +27,7 @@ export type DetailedOfferProps = OfferProps & {
     host: {
         name: string;
         avatarUrl: string;
-        isPro: boolean
+        isPro: boolean;
     };
     images: string[];
     maxAdults: number;
