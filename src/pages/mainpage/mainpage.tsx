@@ -1,16 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Offer from '../../components/offer/offer';
 import Map from '../../components/offer/map';
 import { OfferProps } from '../../types/offer';
 import { City, Point } from '../../types/location';
 import { useAppSelector, useAppDispatch } from '../../hooks/use-store';
-import { filterOffers, pickCity } from '../../store/action';
-import { DefaultOffers } from '../../mocked-data';
+import { fetchAllOffers, selectCity } from '../../store/action';
 import cn from 'classnames';
-import { Dictionary } from '@reduxjs/toolkit';
 import SortOptions from '../../components/sort-options/sort-options';
 import { SortType } from '../../components/sort-options/sort-types';
-
+import Spinner from '../../components/spinner/spinner';
+import { createSelector } from 'reselect';
 
 type LocationItemProps = {
   title: string;
@@ -18,33 +17,36 @@ type LocationItemProps = {
   onClick: (city: string) => void;
 };
 
-const GroupOffersByCity = (offers: OfferProps[]): Dictionary<OfferProps[]> => offers.reduce((acc, offer) => {
-  if (!acc[offer.city.name]) {
-    acc[offer.city.name] = [];
-  }
-  acc[offer.city.name]?.push(offer);
-  return acc;
-}, {} as Dictionary<OfferProps[]>);
+const LocationItem = ({ title, isActive, onClick }: LocationItemProps): JSX.Element => {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    onClick(title);
+  };
 
-const LocationItem = ({ title, isActive, onClick }: LocationItemProps): JSX.Element => (
-  <li className="locations__item">
-    <a
-      href="#"
-      className={cn('locations__item-link', 'tabs__item', { 'tabs__item--active': isActive })}
-      onClick={(e) => {
-        e.preventDefault();
-        onClick(title);
-      }}
-    >
-      <span>{title}</span>
-    </a>
-  </li>
-);
+  return (
+    <li className="locations__item">
+      <a
+        href="#"
+        className={cn('locations__item-link', 'tabs__item', { 'tabs__item--active': isActive })}
+        onClick={handleClick}
+      >
+        <span>{title}</span>
+      </a>
+    </li>
+  );
+};
 
 const ListLocations = ({ locations }: { locations: City[] }): JSX.Element => {
-  const currentLocation = useAppSelector((state) => state.city);
+  const currentLocation = useAppSelector((state) => state.selectedCity);
   const dispatch = useAppDispatch();
-  const offersByCity = GroupOffersByCity(DefaultOffers);
+
+  const handleLocationClick = (cityName: string) => {
+    const city = locations.find((loc) => loc.title === cityName);
+    if (city) {
+      dispatch(selectCity(city));
+      dispatch(fetchAllOffers());
+    }
+  };
 
   return (
     <div className="tabs">
@@ -55,13 +57,7 @@ const ListLocations = ({ locations }: { locations: City[] }): JSX.Element => {
               key={city.title}
               title={city.title}
               isActive={city.title === currentLocation.title}
-              onClick={(cityName: string) => {
-                const selectedCity = locations.find((c) => c.title === cityName);
-                if (selectedCity) {
-                  dispatch(pickCity(selectedCity));
-                  dispatch(filterOffers(offersByCity[cityName] || []));
-                }
-              }}
+              onClick={handleLocationClick}
             />
           ))}
         </ul>
@@ -95,16 +91,40 @@ const ListOffers = ({ offers, setActiveOffer }: { offers: OfferProps[]; setActiv
   );
 };
 
-const GetPointFromOffer = (offer: OfferProps): Point => ({
-  latitude: offer.location.latitude,
-  longitude: offer.location.longitude,
-  title: offer.id,
-});
+const getPointFromOffer = (offer: OfferProps | undefined): Point | undefined => {
+  if (!offer) return undefined;
+  return {
+    latitude: offer.location.latitude,
+    longitude: offer.location.longitude,
+    title: offer.id,
+  };
+};
+
+const selectFilteredOffers = createSelector(
+  [(state) => state.offersList, (state) => state.selectedCity],
+  (offersList, selectedCity) => offersList.filter((offer: OfferProps) => offer.city.name === selectedCity.title)
+);
 
 export default function Hub({ locations }: { locations: City[] }): JSX.Element {
-  const currentLocation = useAppSelector((state) => state.city);
-  const offers = useAppSelector((state) => state.offers);
-  const [activeOffer, setActiveOffer] = useState(offers[0]);
+  const dispatch = useAppDispatch();
+  const currentLocation = useAppSelector((state) => state.selectedCity);
+  const offers = useAppSelector(selectFilteredOffers);
+  const [activeOffer, setActiveOffer] = useState<OfferProps | undefined>(undefined);
+  const isLoading = useAppSelector((state) => state.loading);
+
+  useEffect(() => {
+    dispatch(fetchAllOffers());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (offers.length > 0) {
+      setActiveOffer(offers[0]);
+    }
+  }, [offers]);
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <main className="page__main page__main--index">
@@ -119,7 +139,7 @@ export default function Hub({ locations }: { locations: City[] }): JSX.Element {
             <ListOffers offers={offers} setActiveOffer={setActiveOffer} />
           </section>
           <div className="cities__right-section">
-            <Map selectedPoint={GetPointFromOffer(activeOffer)} city={currentLocation} points={offers.map(GetPointFromOffer)} />
+            <Map selectedPoint={getPointFromOffer(activeOffer)} city={currentLocation} points={offers.map(getPointFromOffer).filter((p: Point | undefined): p is Point => p !== undefined)} />
           </div>
         </div>
       </div>

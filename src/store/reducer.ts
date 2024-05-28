@@ -1,52 +1,94 @@
-import { createReducer, PayloadAction } from '@reduxjs/toolkit';
-import { DefaultLocations, DefaultOffers } from '../mocked-data';
-import { OfferProps } from '../types/offer';
+import { createReducer } from '@reduxjs/toolkit';
+import { DefaultLocations } from '../mocked-data';
+import { OfferProps, OfferReview, DetailedOfferProps } from '../types/offer';
 import { City } from '../types/location';
-import { filterOffers, pickCity, setSortType } from './action';
+import { 
+  filterOffers,
+  selectCity,
+  setSortType,
+  fetchAllOffers,
+  setDetailedOffer,
+  fetchOfferDetails,
+  updateNearbyOffers,
+  fetchNearbyOffers,
+  updateOfferReviews,
+  fetchReviews 
+} from './action';
 import { store } from '../store/index';
 import { SortType } from '../components/sort-options/sort-types';
+import { UserAuthState } from '../components/private-route/userAuthState';
 
-const INITIAL_CITY = DefaultLocations[3];
-
-type StateType = {
-  city: City;
-  offers: OfferProps[];
+interface AppState {
+  selectedCity: City;
+  offersList: OfferProps[];
   sortType: SortType;
-};
+  detailedOffer?: DetailedOfferProps;
+  nearbyOffersList?: OfferProps[];
+  offerReviews?: OfferReview[];
+  authStatus: UserAuthState;
+  loading: boolean;
+}
 
-const initialState: StateType = {
-  city: INITIAL_CITY,
-  offers: DefaultOffers.filter((offer) => offer.city.name === INITIAL_CITY.title),
+const initialAppState: AppState = {
+  selectedCity: DefaultLocations[3],
+  offersList: [],
   sortType: SortType.Popular,
+  loading: false,
+  detailedOffer: undefined,
+  nearbyOffersList: undefined,
+  offerReviews: undefined,
+  authStatus: UserAuthState.Empty
 };
 
-const sortOffers = (offers: OfferProps[], sortType: SortType): OfferProps[] => {
-  switch (sortType) {
-    case SortType.PriceAsc:
-      return [...offers].sort((a, b) => a.price - b.price);
-    case SortType.PriceDesc:
-      return [...offers].sort((a, b) => b.price - a.price);
-    case SortType.Rating:
-      return [...offers].sort((a, b) => b.rating - a.rating);
-    default:
-      return offers;
-  }
-};
-
-export const reducer = createReducer(initialState, (builder) => {
+export const reducer = createReducer(initialAppState, (builder) => {
   builder
-    .addCase(pickCity, (state, action: PayloadAction<City>) => {
-      state.city = action.payload ?? [];
-      state.offers = sortOffers(
-        DefaultOffers.filter((offer) => offer.city.name === state.city.title),
-        state.sortType);
+    .addCase(selectCity, (state, action) => {
+      state.selectedCity = action.payload;
+      state.loading = false;
     })
-    .addCase(filterOffers, (state, action: PayloadAction<OfferProps[] | undefined>) => {
-      state.offers = sortOffers(action.payload ?? [], state.sortType);
+    .addCase(filterOffers, (state, action) => {
+      state.offersList = action.payload ?? [];
+      state.loading = false;
+    })
+    .addCase(setDetailedOffer, (state, action) => {
+      state.detailedOffer = action.payload;
+      state.loading = false;
+    })
+    .addCase(updateNearbyOffers, (state, action) => {
+      state.nearbyOffersList = action.payload;
+      state.loading = false;
+    })
+    .addCase(updateOfferReviews, (state, action) => {
+      state.offerReviews = action.payload;
+      state.loading = false;
     })
     .addCase(setSortType, (state, action) => {
       state.sortType = action.payload;
-      state.offers = sortOffers(state.offers, state.sortType);
+      state.loading = false;
+    })
+    .addCase(fetchAllOffers.pending, (state) => {
+      state.loading = true;
+    })
+    .addCase(fetchAllOffers.fulfilled, (state) => {
+      state.loading = false;
+    })
+    .addCase(fetchOfferDetails.pending, (state) => {
+      state.loading = true;
+    })
+    .addCase(fetchOfferDetails.fulfilled, (state) => {
+      state.loading = false;
+    })
+    .addCase(fetchNearbyOffers.pending, (state) => {
+      state.loading = true;
+    })
+    .addCase(fetchNearbyOffers.fulfilled, (state) => {
+      state.loading = false;
+    })
+    .addCase(fetchReviews.pending, (state) => {
+      state.loading = true;
+    })
+    .addCase(fetchReviews.fulfilled, (state) => {
+      state.loading = false;
     });
 });
 
