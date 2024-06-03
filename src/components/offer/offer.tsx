@@ -25,22 +25,6 @@ function BookmarkButton({ isFavorite, onClick }: { isFavorite: boolean; onClick:
   );
 }
 
-export default function Offer({ offer, setState }: { offer: OfferProps; setState: () => void }): JSX.Element {
-  const offerLink = `/offer/${offer.id}`;
-  return (
-    <article className="cities__card place-card" onMouseOver={setState}>
-      <Premium {...offer} />
-      <div className="cities__image-wrapper place-card__image-wrapper">
-        <Link to={offerLink}>
-          <img className="place-card__image" src={offer.previewImage} width="260" height="200" alt="Place image" />
-        </Link>
-      </div>
-      <OfferInformation offer={offer} offerLink={offerLink} />
-
-    </article>
-  );
-}
-
 export function OfferInformation({ offer, offerLink }: { offer: OfferProps; offerLink: string }): JSX.Element {
   const dispatch = useAppDispatch();
 
@@ -48,7 +32,7 @@ export function OfferInformation({ offer, offerLink }: { offer: OfferProps; offe
     dispatch(addFavoriteOffer({ id: offer.id, status: offer.isFavorite ? 0 : 1 }));
     dispatch(fetchFavoriteOffers());
   };
-  
+
   return (
     <div className="place-card__info">
       <div className="place-card__price-wrapper">
@@ -71,6 +55,22 @@ export function OfferInformation({ offer, offerLink }: { offer: OfferProps; offe
       </h2>
       <p className="place-card__type">{offer.type}</p>
     </div>
+  );
+}
+
+export default function Offer({ offer, setState }: { offer: OfferProps; setState: () => void }): JSX.Element {
+  const offerLink = `/offer/${offer.id}`;
+  return (
+    <article className="cities__card place-card" onMouseOver={setState}>
+      <Premium {...offer} />
+      <div className="cities__image-wrapper place-card__image-wrapper">
+        <Link to={offerLink}>
+          <img className="place-card__image" src={offer.previewImage} width="260" height="200" alt="Place image" />
+        </Link>
+      </div>
+      <OfferInformation offer={offer} offerLink={offerLink} />
+
+    </article>
   );
 }
 

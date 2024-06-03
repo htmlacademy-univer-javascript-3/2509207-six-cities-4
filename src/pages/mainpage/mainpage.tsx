@@ -94,7 +94,9 @@ const ListOffers = ({ offers, setActiveOffer }: { offers: OfferProps[]; setActiv
 };
 
 const getPointFromOffer = (offer: OfferProps | undefined): Point | undefined => {
-  if (!offer) return undefined;
+  if (!offer) {
+    return undefined;
+  }
   return {
     latitude: offer.location.latitude,
     longitude: offer.location.longitude,
@@ -152,7 +154,7 @@ export default function Hub({ locations }: { locations: City[] }): JSX.Element {
                         </div>
                         <span className="header__user-name user__name">{userInfo?.email}</span>
                         <span className="header__favorite-count">
-                        {allOffers.filter((offer) => offer.isFavorite).length}
+                          {allOffers.filter((offer) => offer.isFavorite).length}
                         </span>
                       </NavLink>
                     </li>

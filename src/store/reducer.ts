@@ -2,7 +2,7 @@ import { createReducer } from '@reduxjs/toolkit';
 import { DefaultLocations } from '../mocked-data';
 import { OfferProps, OfferReview, DetailedOfferProps } from '../types/offer';
 import { City } from '../types/location';
-import { 
+import {
   filterOffers,
   selectCity,
   setSortType,
@@ -12,7 +12,7 @@ import {
   updateNearbyOffers,
   fetchNearbyOffers,
   updateOfferReviews,
-  fetchReviews, 
+  fetchReviews,
   setAuthorizationStatus,
   setUserInfo,
   setFavoriteOffers,

@@ -56,7 +56,7 @@ function Favorites(): JSX.Element {
   useEffect(() => {
     dispatch(fetchFavoriteOffers());
   }, [dispatch]);
-  
+
   return (
     <div className="page">
       <header className="header">
