@@ -6,7 +6,6 @@ import Favorites from '../../pages/favorites/favorites';
 import Offer from '../../pages/mainpage/offer';
 import NotFound from '../error/404';
 import { PrivateRoute } from '../private-route/private-route';
-import { UserAuthState } from '../private-route/userAuthState';
 import { store } from '../../store';
 import { City } from '../../types/location';
 
@@ -17,7 +16,7 @@ export default function App(props: { locations: City[] }): JSX.Element {
         <Routes>
           <Route path='/' element={<Hub {...props} />} />
           <Route path='/login' element={<Login />} />
-          <Route path='/favorites' element={<PrivateRoute userAuthState={UserAuthState.Auth}><Favorites favoriteOffers={[]} /></PrivateRoute>} />
+          <Route path='/favorites' element={<PrivateRoute><Favorites favoriteOffers={[]} /></PrivateRoute>} />
           <Route path='/offer/:id' element={<Offer />} />
           <Route path='*' element={<NotFound />} />
         </Routes>

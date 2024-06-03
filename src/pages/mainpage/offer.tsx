@@ -1,13 +1,15 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, NavLink } from 'react-router-dom';
 import { useEffect } from 'react';
 import ReviewForm from '../../components/review-form/review-form';
 import { OfferInformation } from '../../components/offer/offer';
 import { OfferProps, OfferReview, DetailedOfferProps } from '../../types/offer';
 import { useAppDispatch, useAppSelector } from '../../hooks/use-store';
-import { fetchOfferDetails, fetchReviews, fetchNearbyOffers } from '../../store/action';
+import { fetchOfferDetails, fetchReviews, fetchNearbyOffers, addFavoriteOffer, fetchFavoriteOffers } from '../../store/action';
 import NotFound from '../../components/error/404';
 import Spinner from '../../components/spinner/spinner';
 import { UserAuthState } from '../../components/private-route/userAuthState';
+import { logout } from '../../store/action';
+
 
 function PremiumBadge({ isPremium }: DetailedOfferProps): false | JSX.Element {
   return (
@@ -26,6 +28,18 @@ function ProBadge({ isPro }: { isPro: boolean }): false | JSX.Element {
         Pro
       </span>
     )
+  );
+}
+
+function BookmarkButton({ isFavorite, onClick }: { isFavorite: boolean; onClick: () => void }) {
+  const className = isFavorite ? 'offer__bookmark-button offer__bookmark-button--active button' : 'offer__bookmark-button button';
+  return (
+    <button className={className} type="button" onClick={onClick}>
+      <svg className="offer__bookmark-icon" width="31" height="33">
+        <use xlinkHref="#icon-bookmark"></use>
+      </svg>
+      <span className="visually-hidden">{isFavorite ? 'In bookmarks' : 'To bookmarks'}</span>
+    </button>
   );
 }
 
@@ -161,6 +175,15 @@ export default function OfferPage(): JSX.Element {
   const offer = useAppSelector((state) => state.detailedOffer);
   const nearbyOffers = useAppSelector((state) => state.nearbyOffersList);
   const reviews = useAppSelector((state) => state.offerReviews);
+  const userInfo = useAppSelector((state) => state.userInfo);
+  const userAuthState = useAppSelector((state) => state.authStatus);
+  const allOffers = useAppSelector((state) => state.offersList);
+  const onAddOfferToFavorite = () => {
+    if (offer) {
+      dispatch(addFavoriteOffer({ id: offer.id, status: offer.isFavorite ? 0 : 1 }));
+      dispatch(fetchFavoriteOffers());
+    }
+  };
 
   useEffect(() => {
     if (id) {
@@ -190,18 +213,32 @@ export default function OfferPage(): JSX.Element {
             </div>
             <nav className="header__nav">
               <ul className="header__nav-list">
-                <li className="header__nav-item user">
-                  <a className="header__nav-link header__nav-link--profile" href="#">
-                    <div className="header__avatar-wrapper user__avatar-wrapper"></div>
-                    <span className="header__user-name user__name">Oliver.conner@gmail.com</span>
-                    <span className="header__favorite-count">3</span>
-                  </a>
-                </li>
-                <li className="header__nav-item">
-                  <a className="header__nav-link" href="#">
-                    <span className="header__signout">Sign out</span>
-                  </a>
-                </li>
+                {userAuthState === UserAuthState.Auth ? (
+                  <>
+                    <li className="header__nav-item user">
+                      <NavLink className="header__nav-link header__nav-link--profile" to="/favorites">
+                        <div className="header__avatar-wrapper user__avatar-wrapper">
+                          <img src={userInfo?.avatarUrl} alt="User avatar" width="20" height="20" />
+                        </div>
+                        <span className="header__user-name user__name">{userInfo?.email}</span>
+                        <span className="header__favorite-count">
+                          {allOffers.filter((offer) => offer.isFavorite).length}
+                        </span>
+                      </NavLink>
+                    </li>
+                    <li className="header__nav-item">
+                      <Link className="header__nav-link" to="#" onClick={() => dispatch(logout())}>
+                        <span className="header__signout">Sign out</span>
+                      </Link>
+                    </li>
+                  </>
+                ) : (
+                  <li className="header__nav-item">
+                    <Link className="header__nav-link" to="/login">
+                      <span className="header__signout">Sign in</span>
+                    </Link>
+                  </li>
+                )}
               </ul>
             </nav>
           </div>
@@ -215,12 +252,7 @@ export default function OfferPage(): JSX.Element {
               <PremiumBadge {...offer} />
               <div className="offer__name-wrapper">
                 <h1 className="offer__name">{offer.title}</h1>
-                <button className="offer__bookmark-button button" type="button">
-                  <svg className="offer__bookmark-icon" width="31" height="33">
-                    <use xlinkHref="#icon-bookmark"></use>
-                  </svg>
-                  <span className="visually-hidden">{offer.isFavorite ? 'In bookmarks' : 'To bookmarks'}</span>
-                </button>
+                <BookmarkButton isFavorite={offer.isFavorite} onClick={onAddOfferToFavorite} />
               </div>
               <div className="offer__rating rating">
                 <div className="offer__stars rating__stars">

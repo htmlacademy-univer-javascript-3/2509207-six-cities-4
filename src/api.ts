@@ -15,7 +15,7 @@ export const createAPI = (): AxiosInstance => {
   api.interceptors.response.use(
     (response) => response,
     (error: AxiosError<DetailMessageType>) => {
-      throw error;
+      return Promise.reject(error);
     }
   );
   return api;

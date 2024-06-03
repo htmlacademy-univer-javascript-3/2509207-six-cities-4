@@ -4,12 +4,14 @@ import Map from '../../components/offer/map';
 import { OfferProps } from '../../types/offer';
 import { City, Point } from '../../types/location';
 import { useAppSelector, useAppDispatch } from '../../hooks/use-store';
-import { fetchAllOffers, selectCity } from '../../store/action';
+import { fetchAllOffers, logout, selectCity } from '../../store/action';
 import cn from 'classnames';
 import SortOptions from '../../components/sort-options/sort-options';
 import { SortType } from '../../components/sort-options/sort-types';
 import Spinner from '../../components/spinner/spinner';
 import { createSelector } from 'reselect';
+import { UserAuthState } from '../../components/private-route/userAuthState';
+import { Link, NavLink } from 'react-router-dom';
 
 type LocationItemProps = {
   title: string;
@@ -111,6 +113,9 @@ export default function Hub({ locations }: { locations: City[] }): JSX.Element {
   const offers = useAppSelector(selectFilteredOffers);
   const [activeOffer, setActiveOffer] = useState<OfferProps | undefined>(undefined);
   const isLoading = useAppSelector((state) => state.loading);
+  const userInfo = useAppSelector((state) => state.userInfo);
+  const userAuthState = useAppSelector((state) => state.authStatus);
+  const allOffers = useAppSelector((state) => state.offersList);
 
   useEffect(() => {
     dispatch(fetchAllOffers());
@@ -128,6 +133,47 @@ export default function Hub({ locations }: { locations: City[] }): JSX.Element {
 
   return (
     <main className="page__main page__main--index">
+      <header className="header">
+        <div className="container">
+          <div className="header__wrapper">
+            <div className="header__left">
+              <Link to="/" className="header__logo-link">
+                <img className="header__logo" src="/img/logo.svg" alt="6 cities logo" width="81" height="41" />
+              </Link>
+            </div>
+            <nav className="header__nav">
+              <ul className="header__nav-list">
+                {userAuthState === UserAuthState.Auth ? (
+                  <>
+                    <li className="header__nav-item user">
+                      <NavLink className="header__nav-link header__nav-link--profile" to="/favorites">
+                        <div className="header__avatar-wrapper user__avatar-wrapper">
+                          <img src={userInfo?.avatarUrl} alt="User avatar" width="20" height="20" />
+                        </div>
+                        <span className="header__user-name user__name">{userInfo?.email}</span>
+                        <span className="header__favorite-count">
+                        {allOffers.filter((offer) => offer.isFavorite).length}
+                        </span>
+                      </NavLink>
+                    </li>
+                    <li className="header__nav-item">
+                      <Link className="header__nav-link" to="#" onClick={() => dispatch(logout())}>
+                        <span className="header__signout">Sign out</span>
+                      </Link>
+                    </li>
+                  </>
+                ) : (
+                  <li className="header__nav-item">
+                    <Link className="header__nav-link" to="/login">
+                      <span className="header__signout">Sign in</span>
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </header>
       <h1 className="visually-hidden">Cities</h1>
       <ListLocations locations={locations} />
       <div className="cities">
