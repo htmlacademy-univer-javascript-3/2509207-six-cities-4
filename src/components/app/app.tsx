@@ -16,7 +16,7 @@ export default function App(props: { locations: City[] }): JSX.Element {
         <Routes>
           <Route path='/' element={<Hub {...props} />} />
           <Route path='/login' element={<Login />} />
-          <Route path='/favorites' element={<PrivateRoute><Favorites favoriteOffers={[]} /></PrivateRoute>} />
+          <Route path='/favorites' element={<PrivateRoute><Favorites  /></PrivateRoute>} />
           <Route path='/offer/:id' element={<Offer />} />
           <Route path='*' element={<NotFound />} />
         </Routes>
