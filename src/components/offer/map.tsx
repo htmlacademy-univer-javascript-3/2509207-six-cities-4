@@ -3,7 +3,7 @@ import { Icon, Marker, layerGroup } from 'leaflet';
 import { City, Point } from '../../types/location';
 import useMap from '../../hooks/use-map';
 import 'leaflet/dist/leaflet.css';
-
+import { OfferProps } from '../../types/offer';
 
 const defaultCustomIcon = new Icon({
   iconUrl: 'img/pin.svg',
@@ -19,13 +19,26 @@ const currentCustomIcon = new Icon({
 
 type MapProps = {
     city: City;
-    points: Point[];
-    selectedPoint?: Point;
+    offers: OfferProps[];
+    highlightedOffer?: OfferProps;
+    pageType: 'cities' | 'offer';
 }
 
-export default function Map({ city, points, selectedPoint }: MapProps): JSX.Element {
+function getPointFromOffer(offer?: OfferProps): Point | null {
+  return offer ? {
+    latitude: offer.location.latitude,
+    longitude: offer.location.longitude,
+    title: offer.id
+  } : null;
+}
+
+export default function Map({ city, offers, highlightedOffer, pageType }: MapProps): JSX.Element {
+  const offerPoints = offers.map(getPointFromOffer).filter((point): point is Point => point !== null);
+  const selectedPoint = getPointFromOffer(highlightedOffer);
+
   const mapRef = useRef(null);
   const map = useMap(mapRef, city);
+
   useEffect(() => {
     if (map) {
       map.eachLayer((layer) => {
@@ -34,7 +47,7 @@ export default function Map({ city, points, selectedPoint }: MapProps): JSX.Elem
         }
       });
       const markerLayer = layerGroup().addTo(map);
-      points.forEach((point) => {
+      offerPoints.forEach((point) => {
         const marker = new Marker({
           lat: point.latitude,
           lng: point.longitude
@@ -52,12 +65,12 @@ export default function Map({ city, points, selectedPoint }: MapProps): JSX.Elem
         map.removeLayer(markerLayer);
       };
     }
-  }, [map, points, selectedPoint]);
+  }, [map, offerPoints, selectedPoint]);
   useEffect(() => {
     if (map) {
       map.flyTo([city.latitude, city.longitude], city.zoom);
     }
   }, [map, city]);
 
-  return <section className="cities__map map" ref={mapRef}></section>;
+  return <section className={`${pageType}__map map`} ref={mapRef}></section>;
 }
