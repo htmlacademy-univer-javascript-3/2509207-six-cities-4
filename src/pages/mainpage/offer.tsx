@@ -9,7 +9,7 @@ import NotFound from '../../components/error/404';
 import Spinner from '../../components/spinner/spinner';
 import { UserAuthState } from '../../components/private-route/userAuthState';
 import { logout } from '../../store/action';
-
+import Map from '../../components/offer/map';
 
 function PremiumBadge({ isPremium }: DetailedOfferProps): false | JSX.Element {
   return (
@@ -175,7 +175,7 @@ export default function OfferPage(): JSX.Element {
 
   const isLoading = useAppSelector((state) => state.loading);
   const offer = useAppSelector((state) => state.detailedOffer);
-  const nearbyOffers = useAppSelector((state) => state.nearbyOffersList);
+  const nearbyOffers = useAppSelector((state) => state.nearbyOffersList?.slice(0,3) ?? []);
   const reviews = useAppSelector((state) => state.offerReviews);
   const userInfo = useAppSelector((state) => state.userInfo);
   const userAuthState = useAppSelector((state) => state.authStatus);
@@ -273,7 +273,7 @@ export default function OfferPage(): JSX.Element {
               <ReviewsSection reviews={reviews ?? []} id={id ?? ''} />
             </div>
           </div>
-          <section className="offer__map map"></section>
+          <Map city={{title: offer.city.name, ...offer.city.location}} offers={[offer, ...nearbyOffers]} highlightedOffer={offer} pageType="offer" />
         </section>
         <NearbyPlacesList offers={nearbyOffers ?? []} />
       </main>

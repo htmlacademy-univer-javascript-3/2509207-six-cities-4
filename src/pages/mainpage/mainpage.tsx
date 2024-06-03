@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Offer from '../../components/offer/offer';
 import Map from '../../components/offer/map';
 import { OfferProps } from '../../types/offer';
-import { City, Point } from '../../types/location';
+import { City } from '../../types/location';
 import { useAppSelector, useAppDispatch } from '../../hooks/use-store';
 import { fetchAllOffers, logout, selectCity } from '../../store/action';
 import cn from 'classnames';
@@ -93,16 +93,6 @@ const ListOffers = ({ offers, setActiveOffer }: { offers: OfferProps[]; setActiv
   );
 };
 
-const getPointFromOffer = (offer: OfferProps | undefined): Point | undefined => {
-  if (!offer) {
-    return undefined;
-  }
-  return {
-    latitude: offer.location.latitude,
-    longitude: offer.location.longitude,
-    title: offer.id,
-  };
-};
 
 const selectFilteredOffers = createSelector(
   [(state) => state.offersList, (state) => state.selectedCity],
@@ -187,7 +177,7 @@ export default function Hub({ locations }: { locations: City[] }): JSX.Element {
             <ListOffers offers={offers} setActiveOffer={setActiveOffer} />
           </section>
           <div className="cities__right-section">
-            <Map selectedPoint={getPointFromOffer(activeOffer)} city={currentLocation} points={offers.map(getPointFromOffer).filter((p: Point | undefined): p is Point => p !== undefined)} />
+            <Map highlightedOffer={activeOffer} city={currentLocation} offers={offers} pageType="cities"/>
           </div>
         </div>
       </div>
