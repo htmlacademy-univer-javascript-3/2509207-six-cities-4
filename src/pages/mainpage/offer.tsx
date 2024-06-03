@@ -94,11 +94,13 @@ function SingleReview({ review }: { review: OfferReview }): JSX.Element {
 
 function ReviewsSection({ reviews, id }: { reviews: OfferReview[]; id: string }): JSX.Element {
   const isAuthenticated = useAppSelector((state) => state.authStatus) === UserAuthState.Auth;
+  const sortedReviews = reviews.slice().sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const displayedReviews = sortedReviews.slice(0, 10);
   return (
     <section className="offer__reviews reviews">
       <h2 className="reviews__title">Reviews &middot; <span className="reviews__amount">{reviews.length}</span></h2>
       <ul className="reviews__list">
-        {reviews.map((review) => <SingleReview review={review} key={review.id} />)}
+        {displayedReviews.map((review) => <SingleReview review={review} key={review.id} />)}
       </ul>
       {isAuthenticated && <ReviewForm id={id} />}
     </section>
