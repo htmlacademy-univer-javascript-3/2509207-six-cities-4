@@ -1,6 +1,11 @@
 import { OfferProps } from '../../types/offer';
 import { FavoriteOffer } from '../../components/offer/offer';
-
+import { Link, NavLink } from 'react-router-dom';
+import { useAppSelector, useAppDispatch } from '../../hooks/use-store';
+import { logout, fetchFavoriteOffers } from '../../store/action';
+import { useEffect } from 'react';
+import { DefaultLocations } from '../../mocked-data';
+import { UserAuthState } from '../../components/private-route/userAuthState';
 
 function ListCityFavoriteOffers({ offers }: { offers: OfferProps[] }): JSX.Element {
   return (
@@ -24,53 +29,72 @@ function ListCityFavoriteOffers({ offers }: { offers: OfferProps[] }): JSX.Eleme
 }
 
 function ListFavoriteOffers({ offers }: { offers: OfferProps[] }): JSX.Element {
-  const offersByCities = [offers];
+  const offersByCity: Record<string, OfferProps[]> = offers.reduce<Record<string, OfferProps[]>>((res: Record<string, OfferProps[]>, a: OfferProps) => {
+    res[a.city.name] = res[a.city.name] || [];
+    res[a.city.name].push(a);
+    return res;
+  }, {});
+
   return (
     <ul className="favorites__list">
       {
-        offersByCities.map((offersByCity) => (
-          <ListCityFavoriteOffers offers={offersByCity} key={(offersByCity)[0].city.name} />
+        DefaultLocations.map((location) => offersByCity[location.title] && (
+          <ListCityFavoriteOffers offers={offersByCity[location.title]} key={location.title}/>
         ))
       }
     </ul>
   );
 }
 
-function Favorites({ favoriteOffers }: { favoriteOffers: OfferProps[] }): JSX.Element {
+function Favorites(): JSX.Element {
+  const dispatch = useAppDispatch();
+  const userAuthState = useAppSelector((state) => state.authStatus);
+  const userInfo = useAppSelector((state) => state.userInfo);
+  const allOffers = useAppSelector((state) => state.offersList);
+  const favoriteOffers = useAppSelector((state) => state.favoriteOffers) ?? [];
+
+  useEffect(() => {
+    dispatch(fetchFavoriteOffers());
+  }, [dispatch]);
+
   return (
     <div className="page">
       <header className="header">
         <div className="container">
           <div className="header__wrapper">
             <div className="header__left">
-              <a className="header__logo-link" href="markup/main.html">
-                <img className="header__logo" src="/img/logo.svg"
-                  alt="6 cities logo" width="81" height="41"
-                />
-              </a>
+              <Link to="/" className="header__logo-link">
+                <img className="header__logo" src="/img/logo.svg" alt="6 cities logo" width="81" height="41" />
+              </Link>
             </div>
             <nav className="header__nav">
               <ul className="header__nav-list">
-                <li className="header__nav-item user">
-                  <a className="header__nav-link header__nav-link--profile"
-                    href="#"
-                  >
-                    <div
-                      className="header__avatar-wrapper user__avatar-wrapper"
-                    >
-                    </div>
-                    <span
-                      className="header__user-name user__name"
-                    >Oliver.conner@gmail.com
-                    </span>
-                    <span className="header__favorite-count">3</span>
-                  </a>
-                </li>
-                <li className="header__nav-item">
-                  <a className="header__nav-link" href="#">
-                    <span className="header__signout">Sign out</span>
-                  </a>
-                </li>
+                {userAuthState === UserAuthState.Auth ? (
+                  <>
+                    <li className="header__nav-item user">
+                      <NavLink className="header__nav-link header__nav-link--profile" to="/favorites">
+                        <div className="header__avatar-wrapper user__avatar-wrapper">
+                          <img src={userInfo?.avatarUrl} alt="User avatar" width="20" height="20" />
+                        </div>
+                        <span className="header__user-name user__name">{userInfo?.email}</span>
+                        <span className="header__favorite-count">
+                          {allOffers.filter((offer) => offer.isFavorite).length}
+                        </span>
+                      </NavLink>
+                    </li>
+                    <li className="header__nav-item">
+                      <Link className="header__nav-link" to="#" onClick={() => dispatch(logout())}>
+                        <span className="header__signout">Sign out</span>
+                      </Link>
+                    </li>
+                  </>
+                ) : (
+                  <li className="header__nav-item">
+                    <Link className="header__nav-link" to="/login">
+                      <span className="header__signout">Sign in</span>
+                    </Link>
+                  </li>
+                )}
               </ul>
             </nav>
           </div>
@@ -85,14 +109,13 @@ function Favorites({ favoriteOffers }: { favoriteOffers: OfferProps[] }): JSX.El
         </div>
       </main>
       <footer className="footer container">
-        <a className="footer__logo-link" href="markup/main.html">
-          <img className="footer__logo" src="/img/logo.svg" alt="6 cities logo"
-            width="64" height="33"
-          />
-        </a>
+        <Link to="/" className="footer__logo-link">
+          <img className="footer__logo" src="/img/logo.svg" alt="6 cities logo" width="64" height="33" />
+        </Link>
       </footer>
     </div>
   );
 }
+
 
 export default Favorites;
